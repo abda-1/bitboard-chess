@@ -22,18 +22,34 @@ class Board{
         unordered_map<PieceType, U64> currentBoard;
         void initialiseBoard();
 
-        // helper
-        void printU64(U64 board);
-
     public:
         Board();
+
         unordered_map<PieceType, U64> getCurrentBoard();
+        void movePiece(PieceType type, int fromPos, int toPos);
         
-        
+        // helper
+        void printU64(U64 board);
 
 
 
 };
+
+void Board::movePiece(PieceType type, int fromPos, int toPos){
+
+    U64& bitboard = currentBoard[type];
+    U64 fromMask = 1ULL << fromPos;
+    U64 toMask = 1ULL << toPos;
+    
+    // clear the bit at the original position
+    bitboard &= ~fromMask;
+
+    // set the bit at the new position
+    bitboard |= toMask;
+
+
+}
+
 
 // helper
 void Board::printU64(U64 board){

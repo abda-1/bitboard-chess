@@ -2,6 +2,7 @@
 #include <iostream>
 #include <UI.hpp>
 #include <Board.hpp>
+#include <MoveGenerator.hpp>
 
 int main(int argc, char *argv[]){
 
@@ -34,11 +35,16 @@ int main(int argc, char *argv[]){
 
     // create board and ui instances
     Board chessBoard;
+    MoveGenerator moveGenerator(chessBoard.getCurrentBoard());
     UI ui(renderer, &chessBoard, squareSize);
     ui.loadImages();
 
     // initialise main game loop
     SDL_Event windowEvent;
+    bool mouseHeld = false;
+    PieceType selectedPiece;
+    int selectedPieceX, selectedPieceY;
+
     while(true){
         
         // event handling
@@ -46,6 +52,79 @@ int main(int argc, char *argv[]){
             
             // quit condition
             if(SDL_QUIT == windowEvent.type) break;
+
+            else if (windowEvent.type == SDL_MOUSEBUTTONDOWN) {
+                
+                // record the position of the mouse            
+                int mouseX, mouseY;
+                SDL_GetMouseState(&mouseX, &mouseY);
+
+                // convert to chessboard coordinates
+                int row = 7 - mouseY / squareSize;
+                int col = mouseX / squareSize;
+
+                // convert to bitboard position
+                int bitPos = row * 8 + col;
+                U64 mask = 1ULL << bitPos;
+
+                // check which piece has a corresponding bit set at that location.
+                for(const auto& [type, bitboard] : chessBoard.getCurrentBoard()){
+                    if(bitboard & mask){
+                        selectedPiece = type;
+                        selectedPieceX = col;
+                        selectedPieceY = row;
+                        break;
+                    }
+
+                }
+
+                std::cout << "Selected " << pieceTypeToString(selectedPiece) << " at: " << row << ", " << col << endl; 
+
+            }
+
+            else if (windowEvent.type == SDL_MOUSEBUTTONUP) {
+               
+                // record the position of the mouse            
+                int releaseX, releaseY;
+                SDL_GetMouseState(&releaseX, &releaseY);
+
+                // convert to chessboard coordinates
+                int releaseRow = 7 - releaseY / squareSize;
+                int releaseCol = releaseX / squareSize;
+
+                // convert to bitboard position
+                int releaseBitPos = releaseRow * 8 + releaseCol;
+                U64 releaseMask = 1ULL << releaseBitPos;
+
+                // need to check whether the move was valid
+                U64 validMoves;
+
+                if(selectedPiece == PieceType::WP){
+                    
+                    int fromBitPos = selectedPieceY * 8 + selectedPieceX;
+                    validMoves = moveGenerator.generateWhitePawn(fromBitPos);
+                
+                }
+                
+                // if the bits allign, then we can move the piece
+                if(validMoves & releaseMask){
+                    
+                    int fromBitPos = selectedPieceY * 8 + selectedPieceX;
+
+                    // move the piece on the board
+                    chessBoard.movePiece(selectedPiece, fromBitPos, releaseBitPos);
+
+                    std::cout << "Moved " << pieceTypeToString(selectedPiece) << " to: " << releaseRow << ", " << releaseCol << endl; 
+
+                } 
+
+                else {
+                    cout << "Invalid move" << endl;
+                }
+
+                // reset the selected piece type
+                selectedPiece = PieceType::EMPTY;
+            }
 
         }
 

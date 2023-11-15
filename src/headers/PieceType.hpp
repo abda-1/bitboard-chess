@@ -6,7 +6,7 @@
 
 enum class PieceType{
 
-    BP, BR, BB, BN, BQ, BK, WP, WR, WB, WN, WQ, WK
+    BP, BR, BB, BN, BQ, BK, WP, WR, WB, WN, WQ, WK, EMPTY
 
 };
 
@@ -23,7 +23,8 @@ std::string pieceTypeToString(PieceType type) {
         {PieceType::WB, "White Bishop"},
         {PieceType::WN, "White Knight"},
         {PieceType::WQ, "White Queen"},
-        {PieceType::WK, "White King"}
+        {PieceType::WK, "White King"},
+        {PieceType::EMPTY, "Empty"}
     };
 
     auto it = pieceTypeNames.find(type);

@@ -1,25 +1,23 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <UI.hpp>
-
-const int WIDTH = 800, HEIGHT = 600;
+#include <Board.hpp>
 
 int main(int argc, char *argv[]){
 
-    UI UI;
+    // initialise SDL
 
-    // initialise
-    SDL_Init(SDL_INIT_EVERYTHING);
-
-    // error when sdl cannot initialise for some reason
-    if(SDL_Init(SDL_INIT_VIDEO) < 0){
+    if(SDL_Init(SDL_INIT_EVERYTHING) < 0){
         std::cerr << "SDL could not initalise! SDL_Error: " << SDL_GetError() << std::endl;
         return -1;
     }
 
     // create window
-    SDL_Window* window = SDL_CreateWindow("Chess Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, UI.getBoardSize(), UI.getBoardSize(), SDL_WINDOW_ALLOW_HIGHDPI);
+    int squareSize = 75;
 
+    SDL_Window* window = SDL_CreateWindow("Chess Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, squareSize*8, squareSize*8, SDL_WINDOW_ALLOW_HIGHDPI);
+
+    // check that window has been properly instantiated
     if(window == NULL){
         std::cerr << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
         return -1;
@@ -34,18 +32,27 @@ int main(int argc, char *argv[]){
         return -1;
     }
 
+    // create board and ui instances
+    Board chessBoard;
+    UI ui(renderer, &chessBoard, squareSize);
+    ui.loadImages();
+
     // initialise main game loop
     SDL_Event windowEvent;
-
     while(true){
         
-        // quit condition
+        // event handling
         if(SDL_PollEvent(&windowEvent)){
+            
+            // quit condition
             if(SDL_QUIT == windowEvent.type) break;
+
         }
 
+        // render the board
         SDL_RenderClear(renderer);
-        UI.drawChessboard(renderer);
+        ui.drawChessboard();
+        ui.drawPieces();
         SDL_RenderPresent(renderer);
         
     }

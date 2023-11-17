@@ -27,13 +27,49 @@ class Board{
 
         unordered_map<PieceType, U64> getCurrentBoard();
         void movePiece(PieceType type, int fromPos, int toPos);
+        void capturePiece(PieceType type, int position);
+
+        bool isOpponentPiece(PieceType piece1, PieceType piece2);
         
         // helper
         void printU64(U64 board);
 
+        void clearBoard();
+
 
 
 };
+
+void Board::clearBoard(){
+
+    for(auto& [type, bb] : currentBoard){
+        bb = 0;
+    }
+
+}
+
+bool Board::isOpponentPiece(PieceType piece1, PieceType piece2){
+
+    // obtain the type of the first piece:
+    char colour1 = pieceTypeToString(piece1)[0];
+    char colour2 = pieceTypeToString(piece2)[0];
+
+    return colour1 != colour2;
+    
+}
+
+
+void Board::capturePiece(PieceType type, int position){
+
+    if(type != PieceType::EMPTY){
+        U64& bitboard = currentBoard[type];
+        U64 mask = 1ULL << position;
+        
+        // clear the bit at the position
+        bitboard &= ~mask;
+    }
+
+}
 
 void Board::movePiece(PieceType type, int fromPos, int toPos){
 

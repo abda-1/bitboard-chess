@@ -16,7 +16,7 @@ using namespace std;
     UI Class Responsibilites (class that works with SDL2)
         - generate game state (chessboard) -> will be taken from Game class
         - capture user input
-        - display game status (i.e. turn / checkmate / evaluation)
+        - displaying on window
             
 */
 
@@ -30,6 +30,8 @@ class UI{
         SDL_Renderer* renderer;
         Board* board;
 
+        // U64 currentValidMoves;
+
         void setSquareSize(int SQ_SIZE);
 
     public:
@@ -41,11 +43,55 @@ class UI{
         void drawPieces();
         void loadImages();
 
+        // void drawCircle(int centreX, int centreY, int radius);
+        // void drawValidMoves();
+        // void setValidMoves(U64 moves);
+
+
         // copy constructor and copy assignment operators should not be allowed
         UI(const UI&) = delete;
         UI& operator=(const UI&) = delete;
         
 };
+
+// void UI::setValidMoves(U64 moves){
+//     currentValidMoves = moves;
+// }
+
+// void UI::drawCircle(int centreX, int centreY, int radius){
+
+//     for (int w = 0; w < radius * 2; w++) {
+//         for (int h = 0; h < radius * 2; h++) {
+//             int dx = radius - w;
+//             int dy = radius - h;
+
+//             if((dx*dx + dy*dy) <= (radius * radius)){
+//                 SDL_RenderDrawPoint(renderer, centreX + dx, centreY + dy);
+//             }
+//         }
+//     }
+
+// }
+
+// void UI::drawValidMoves() {
+
+//     U64 mask = 1ULL;
+
+//     for(int i = 0; i < 64; i++, mask <<= 1) {
+//         if (currentValidMoves & mask) {
+//             int row = 7 - (i/8);
+//             int col = i % 8;
+
+//             int x = col * SQUARE_SIZE + (SQUARE_SIZE / 2);
+//             int y = row * SQUARE_SIZE + (SQUARE_SIZE / 2);
+//             int radius = SQUARE_SIZE / 4;
+
+//             SDL_SetRenderDrawColor(renderer, 209, 213, 183, 255); // grey
+//             drawCircle(x, y, radius);
+//         }
+//     }
+
+// }
 
 void UI::setSquareSize(int SQ_SIZE){
     SQUARE_SIZE = SQ_SIZE;

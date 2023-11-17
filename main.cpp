@@ -7,7 +7,6 @@
 int main(int argc, char *argv[]){
 
     // initialise SDL
-
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0){
         std::cerr << "SDL could not initalise! SDL_Error: " << SDL_GetError() << std::endl;
         return -1;
@@ -17,8 +16,6 @@ int main(int argc, char *argv[]){
     int squareSize = 75;
 
     SDL_Window* window = SDL_CreateWindow("Chess Engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, squareSize*8, squareSize*8, SDL_WINDOW_ALLOW_HIGHDPI);
-
-    // check that window has been properly instantiated
     if(window == NULL){
         std::cerr << "Window could not be created! SDL_Error: " << SDL_GetError() << std::endl;
         return -1;
@@ -35,14 +32,15 @@ int main(int argc, char *argv[]){
 
     // create board and ui instances
     Board chessBoard;
-    MoveGenerator moveGenerator(chessBoard.getCurrentBoard());
+    MoveGenerator moveGenerator(chessBoard);
+
     UI ui(renderer, &chessBoard, squareSize);
     ui.loadImages();
 
     // initialise main game loop
     SDL_Event windowEvent;
-    bool mouseHeld = false;
     PieceType selectedPiece;
+    PieceType capturedPiece;
     int selectedPieceX, selectedPieceY;
 
     while(true){
@@ -51,7 +49,9 @@ int main(int argc, char *argv[]){
         if(SDL_PollEvent(&windowEvent)){
             
             // quit condition
-            if(SDL_QUIT == windowEvent.type) break;
+            if(SDL_QUIT == windowEvent.type){
+                break;
+            }
 
             else if (windowEvent.type == SDL_MOUSEBUTTONDOWN) {
                 
@@ -78,8 +78,13 @@ int main(int argc, char *argv[]){
 
                 }
 
-                std::cout << "Selected " << pieceTypeToString(selectedPiece) << " at: " << row << ", " << col << endl; 
-
+                // make sure that a valid piece was selected
+                if(selectedPiece != PieceType::EMPTY){
+                    std::cout << "Selected " << pieceTypeToString(selectedPiece) << " at: " << row << ", " << col << endl;
+                    cout << "Selected Bit Pos: " << bitPos << endl;
+                    chessBoard.printU64(mask);
+                }
+                
             }
 
             else if (windowEvent.type == SDL_MOUSEBUTTONUP) {
@@ -99,25 +104,98 @@ int main(int argc, char *argv[]){
                 // need to check whether the move was valid
                 U64 validMoves;
 
-                if(selectedPiece == PieceType::WP){
-                    
-                    int fromBitPos = selectedPieceY * 8 + selectedPieceX;
+                int fromBitPos = selectedPieceY * 8 + selectedPieceX;
+
+                // determine which piece was selected, and if the square was empty, do nothing
+                if (selectedPiece == PieceType::EMPTY) {
+                    continue;
+                }
+
+                else if (selectedPiece == PieceType::WP) {
                     validMoves = moveGenerator.generateWhitePawn(fromBitPos);
+                }
                 
+                else if (selectedPiece == PieceType::BP) {
+                    validMoves = moveGenerator.generateBlackPawn(fromBitPos);
+                }
+
+                else if (selectedPiece == PieceType::WN) {
+                    validMoves = moveGenerator.generateWhiteKnight(fromBitPos);
+                }
+
+                else if (selectedPiece == PieceType::BN) {
+                    validMoves = moveGenerator.generateBlackKnight(fromBitPos);
+                }
+
+                else if (selectedPiece == PieceType::WR) {
+                    validMoves = moveGenerator.generateWhiteRook(fromBitPos);
+                }
+
+                else if (selectedPiece == PieceType::BR) {
+                    validMoves = moveGenerator.generateBlackRook(fromBitPos);
+                }
+
+                else if (selectedPiece == PieceType::WB) {
+                    validMoves = moveGenerator.generateWhiteBishop(fromBitPos);
+                }
+
+                else if (selectedPiece == PieceType::BB) {
+                    validMoves = moveGenerator.generateBlackBishop(fromBitPos);
+                }
+
+                else if (selectedPiece == PieceType::WQ) {
+                    validMoves = moveGenerator.generateWhiteQueen(fromBitPos);
+                }
+
+                else if (selectedPiece == PieceType::BQ) {
+                    validMoves = moveGenerator.generateBlackQueen(fromBitPos);
+                }
+
+                else if (selectedPiece == PieceType::WK) {
+                    validMoves = moveGenerator.generateWhiteKing(fromBitPos);
+                }
+
+                else if (selectedPiece == PieceType::BK) {
+                    validMoves = moveGenerator.generateBlackKing(fromBitPos);
                 }
                 
                 // if the bits allign, then we can move the piece
                 if(validMoves & releaseMask){
+                    PieceType capturedPiece = PieceType::EMPTY;
                     
-                    int fromBitPos = selectedPieceY * 8 + selectedPieceX;
+                    for(const auto& [type, bitboard] : chessBoard.getCurrentBoard()){
+                        if((bitboard & releaseMask) && (type != selectedPiece)){
+                            capturedPiece = type;
+                            break;
+                        }
+                    }
 
-                    // move the piece on the board
-                    chessBoard.movePiece(selectedPiece, fromBitPos, releaseBitPos);
+                    // check whether the move was a capture -> capturedPiece needs to be opponent piece. 
+                    if(capturedPiece != PieceType::EMPTY && chessBoard.isOpponentPiece(selectedPiece, capturedPiece)){
 
-                    std::cout << "Moved " << pieceTypeToString(selectedPiece) << " to: " << releaseRow << ", " << releaseCol << endl; 
+                        chessBoard.capturePiece(capturedPiece, releaseBitPos);
+                        cout << pieceTypeToString(selectedPiece) << " captured " << pieceTypeToString(capturedPiece) << "!" << endl;
+                        
+                        chessBoard.movePiece(selectedPiece, fromBitPos, releaseBitPos);
+                        std::cout << "Moved " << pieceTypeToString(selectedPiece) << " to: " << releaseRow << ", " << releaseCol << endl;
+                        
+                        cout << "Release Bit Pos: " << releaseBitPos << endl;
+                        chessBoard.printU64(releaseMask);
 
+                    }
+
+                    // move was not a capture move
+                    else if (capturedPiece == PieceType::EMPTY) {
+
+                        chessBoard.movePiece(selectedPiece, fromBitPos, releaseBitPos);
+                        std::cout << "Moved " << pieceTypeToString(selectedPiece) << " to: " << releaseRow << ", " << releaseCol << endl;
+                        
+                        chessBoard.printU64(releaseMask);
+
+                    }
+                    
                 } 
-
+                
                 else {
                     cout << "Invalid move" << endl;
                 }

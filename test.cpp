@@ -17,13 +17,16 @@ void print(U64 board){
 void testMoveGeneration() {
 
     Board board;
+    board.clearBoard();
 
-    MoveGenerator mg(board.getCurrentBoard());
+    MoveGenerator mg(board);
     
-    U64 validPawnMoves = mg.generateWhitePawn();
+    U64 validMoves = 0;
+    int pos = 19;
 
-    std::cout << "White pawn valid moves: \n";
-    print(validPawnMoves);
+    validMoves = mg.generateWhiteKing(pos);
+    std::cout << "White bishop valid moves: \n";
+    print(validMoves | 1ULL << pos);
 
 }
 

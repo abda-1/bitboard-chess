@@ -22,9 +22,9 @@ void testMoveGeneration() {
     MoveGenerator mg(board);
     
     U64 validMoves = 0;
-    int pos = 14;
+    int pos = 19;
 
-    validMoves = mg.generateWhiteBishop(pos);
+    validMoves = mg.generateWhiteKing(pos);
     std::cout << "White bishop valid moves: \n";
     print(validMoves | 1ULL << pos);
 

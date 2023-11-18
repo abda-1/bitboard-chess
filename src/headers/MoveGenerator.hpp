@@ -333,15 +333,15 @@ U64 MoveGenerator::generateWhiteBishop (int position) {
         if(move & (whitePieces | blackPieces)) break;
     }
 
-    // diagonal left down
-    for (int i = position - 9; i >= 0 && i % 8 != 7; i -= 9) {
+    // diagonal right down
+    for (int i = position - 9; i >= 0 && i % 8 != 0; i -= 7) {
         U64 move = 1ULL << i;
         validMoves |= move;
         if(move & (whitePieces | blackPieces)) break;
     }
 
-    // diagonal right down
-    for (int i = position - 7; i >= 0 && i % 8 != 0; i -= 7) {
+    // diagonal left down
+    for (int i = position - 7; i >= 0 && i % 8 != 7; i -= 7) {
         U64 move = 1ULL << i;
         validMoves |= move;
         if(move & (whitePieces | blackPieces)) break;
@@ -372,15 +372,15 @@ U64 MoveGenerator::generateBlackBishop (int position) {
         if(move & (whitePieces | blackPieces)) break;
     }
 
-    // diagonal left down
-    for (int i = position - 9; i >= 0 && i % 8 != 7; i -= 9) {
+    // diagonal right down
+    for (int i = position - 9; i >= 0 && i % 8 != 0; i -= 7) {
         U64 move = 1ULL << i;
         validMoves |= move;
         if(move & (whitePieces | blackPieces)) break;
     }
 
-    // diagonal right down
-    for (int i = position - 7; i >= 0 && i % 8 != 0; i -= 7) {
+    // diagonal left down
+    for (int i = position - 7; i >= 0 && i % 8 != 7; i -= 7) {
         U64 move = 1ULL << i;
         validMoves |= move;
         if(move & (whitePieces | blackPieces)) break;

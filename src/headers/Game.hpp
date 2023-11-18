@@ -8,37 +8,15 @@
             
 */
 
-#include "Board.hpp"
-#include "MoveGenerator.hpp"
 class Game{
 
-    private:
-        Board chessBoard;
-        MoveGenerator MoveGenerator;
-        bool whiteTurn;
-
     public:
-        Game();
-
-        bool isWhiteTurn();
-        void switchTurn();
-        bool isCheck(bool whiteSide);
+        void startGame();
         
 
 
 
 };
-
-Game::Game() : MoveGenerator(chessBoard), whiteTurn(true) {
-}
-
-bool Game::isWhiteTurn(){
-    return whiteTurn;
-}
-
-void Game::switchTurn(){
-    whiteTurn = !whiteTurn;
-}
 
 
 

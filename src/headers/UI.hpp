@@ -43,6 +43,8 @@ class UI{
         void drawPieces();
         void loadImages();
 
+        void drawDraggedPiece(PieceType draggedPiece, int x , int y);
+
         // void drawCircle(int centreX, int centreY, int radius);
         // void drawValidMoves();
         // void setValidMoves(U64 moves);
@@ -180,6 +182,17 @@ void UI::drawPieces(){
             }
         
         }
+    }
+
+}
+
+void UI::drawDraggedPiece(PieceType draggedPiece, int x, int y) {
+
+    SDL_Texture* texture = textureManager.getTexture(draggedPiece);
+    SDL_Rect destRect = {x, y, SQUARE_SIZE, SQUARE_SIZE};
+
+    if(texture) {
+        SDL_RenderCopy(renderer, texture, nullptr, &destRect);
     }
 
 }

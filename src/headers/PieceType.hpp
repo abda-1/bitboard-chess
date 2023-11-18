@@ -10,6 +10,18 @@ enum class PieceType{
 
 };
 
+enum class BlackPiece{
+
+    BP, BR, BB, BN, BQ, BK
+
+};
+
+enum class WhitePiece{
+
+    WP, WR, W, WN, WQ, WK
+
+};
+
 std::string pieceTypeToString(PieceType type) {
     static std::unordered_map<PieceType, std::string> pieceTypeNames = {
         {PieceType::BP, "Black Pawn"},

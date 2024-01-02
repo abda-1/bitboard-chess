@@ -24,20 +24,25 @@ class Board{
 
     public:
         Board();
-        void clearBoard();
-
-        unordered_map<PieceType, U64> getCurrentBoard();
-
+        
+        // Board move helpers
         void movePiece(PieceType type, int fromPos, int toPos);
         void capturePiece(PieceType type, int position);
         void executeMove(PieceType selectedPiece, int fromPos, int toPos);
-        bool isOpponentPiece(PieceType piece1, PieceType piece2);
+        bool isOpponentPiece(PieceType pieceOne, PieceType pieceTwo);
 
+        // utility 
         PieceType getPieceAtPosition (int position);
-
+        void clearBoard();
         void printU64(U64 board);
+        unordered_map<PieceType, U64> getCurrentBoard();
+
         
 };
+
+Board::Board(){
+    initialiseBoard();
+}
 
 void Board::executeMove (PieceType selectedPiece, int fromPos, int toPos) {
 
@@ -65,9 +70,6 @@ PieceType Board::getPieceAtPosition (int position) {
 
     return PieceType::EMPTY;
 }
-
-
-
 
 void Board::clearBoard(){
 
@@ -112,9 +114,7 @@ void Board::movePiece(PieceType type, int fromPos, int toPos){
     // Set the bit at the new location
     bitboard |= toMask;
 
-
 }
-
 
 // Print the board (debugging purposes)
 void Board::printU64(U64 board){
@@ -129,13 +129,9 @@ void Board::printU64(U64 board){
 
 }
 
-Board::Board(){
-    initialiseBoard();
-}
-
 void Board::initialiseBoard(){
 
-    // starting positions for the white pieces
+    // Starting positions for the white pieces
     currentBoard[PieceType::WP] = 0xFF00ULL;
     currentBoard[PieceType::WR] = 0x81ULL;
     currentBoard[PieceType::WN] = 0x42ULL;
@@ -143,7 +139,7 @@ void Board::initialiseBoard(){
     currentBoard[PieceType::WQ] = 0x08ULL;
     currentBoard[PieceType::WK] = 0x10ULL;
 
-    // black pieces are shifted "upwards"
+    // Black pieces are shifted "upwards"
     currentBoard[PieceType::BP] = 0xFF00ULL << 8 * 5;
     currentBoard[PieceType::BR] = 0x81ULL << 8 * 7;
     currentBoard[PieceType::BN] = 0x42ULL << 8 * 7;

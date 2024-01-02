@@ -35,11 +35,50 @@ class MoveGenerator{
         MoveGenerator(Board& board);
         void updatePieces();
         U64 generateMoves (PieceType pieceType, int position);
-        
+        U64 generateAllMoves (bool isWhite);
+        bool isKingInCheck (bool isWhite);
 
 };
 
-// Generate all possible moves
+// Check if king of given colour is in check
+bool MoveGenerator::isKingInCheck (bool isWhite){
+
+    // Here the assumption is made that there is only ever one king on the board hence, only one set bit
+    U64 kingBoard = isWhite ? chessBoard.getCurrentBoard()[PieceType::WK] : chessBoard.getCurrentBoard()[PieceType::BK];
+
+    // Generate all moves for opponent
+    U64 opponentMoves = generateAllMoves(!isWhite);
+
+    return kingBoard & opponentMoves;
+}
+
+// Generate all the possible moves for a given colour
+U64 MoveGenerator::generateAllMoves (bool isWhite) {
+
+    U64 allMoves = 0;
+    auto currentBoard = chessBoard.getCurrentBoard();
+
+    // Iterate only over the pieces of the given colour
+    for (const auto& [type, bitboard] : currentBoard) {
+        if ((isWhite && (pieceTypeToString(type)[0] == 'W')) || (!isWhite && (pieceTypeToString(type)[0] == 'B'))) {
+
+            U64 allPieces = bitboard;
+
+            // Iterate over the set bits and incrementally generate all moves
+            while (allPieces) {
+                int index = findLSBIndex(allPieces);
+                if (index == -1) break;
+                allPieces &= ~(1ULL << index);
+                allMoves |= generateMoves(type, index);
+            }
+        }
+    }
+
+    return allMoves;
+
+}
+
+// Generate all possible moves for a specific piece
 U64 MoveGenerator::generateMoves(PieceType pieceType, int position) {
 
     // Return the generated moves based on the pieceType 

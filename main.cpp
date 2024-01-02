@@ -197,6 +197,25 @@ void gameLoop (SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGen
         if (selectedPiece != PieceType::EMPTY) {
             ui.drawValidMoves(validMoves);
         }
+
+        // Check if the king is in check and draw a rectangle if it is
+        if (moveGenerator.isKingInCheck(isWhiteTurn)) {
+            U64 kingBoard = isWhiteTurn ? chessBoard.getCurrentBoard()[PieceType::WK] : chessBoard.getCurrentBoard()[PieceType::BK];
+            int kingPosition = findLSBIndex(kingBoard);
+            int kingRow = kingPosition / 8;
+            int kingCol = kingPosition % 8;
+
+            // Convert board position to pixel coordinates
+            int x = kingCol * SQUARE_SIZE;
+            int y = (7 - kingRow) * SQUARE_SIZE;
+
+            // Set the color for the rectangle (e.g., red)
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // RGBA
+
+            SDL_Rect rect = {x, y, SQUARE_SIZE, SQUARE_SIZE};
+            SDL_RenderDrawRect(renderer, &rect); // or SDL_RenderFillRect for a filled rectangle
+        }
+
         SDL_RenderPresent(renderer);
     }
 }

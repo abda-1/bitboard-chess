@@ -5,15 +5,6 @@
 #include <PieceType.hpp>
 #include <Board.hpp>
 
-
-/*
-
-    MoveGenerator
-        - will take in 12 individual bitboards representing the chessBoard.
-        - will generate moves for each piece type and then return the package of boards as an unordered_map
-
-*/
-
 // Constants to assist with preventing generating moves that 'wrap' around the board
 const U64 RANK_8 = 0xFF00000000000000;
 const U64 RANK_7 = 0x00FF000000000000;
@@ -32,9 +23,6 @@ class MoveGenerator{
         Board& chessBoard;
         U64 whitePieces, blackPieces;
 
-        U64 generateWhitePawn(int position);
-        U64 generateBlackPawn(int position);
-
         U64 generatePawnMoves(int position, bool isWhite);
         U64 generateKnightMoves(int position, bool isWhite);
         U64 generateRookMoves(int position, bool isWhite);
@@ -46,48 +34,51 @@ class MoveGenerator{
     public:
         MoveGenerator(Board& board);
         void updatePieces();
-
-        U64 generateMoves(PieceType pieceType, int position) {
-
-            // Return the generated moves based on the pieceType 
-            switch (pieceType) {
-
-                // Black Pieces
-                case PieceType::BP:
-                    return generatePawnMoves(position, false);
-                case PieceType::BR:
-                    return generateRookMoves(position, false);
-                case PieceType::BB:
-                    return generateBishopMoves(position, false);
-                case PieceType::BN:
-                    return generateKnightMoves(position, false);
-                case PieceType::BQ:
-                    return generateQueenMoves(position, false);
-                case PieceType::BK:
-                    return generateKingMoves(position, false);
-
-                // White Pieces
-                case PieceType::WP:
-                    return generatePawnMoves(position, true);
-                case PieceType::WR:
-                    return generateRookMoves(position, true);
-                case PieceType::WB:
-                    return generateBishopMoves(position, true);
-                case PieceType::WN:
-                    return generateKnightMoves(position, true);
-                case PieceType::WQ:
-                    return generateQueenMoves(position, true);
-                case PieceType::WK:
-                    return generateKingMoves(position,  true);
-
-                default:
-                    return 0;
-            
-            }
-
-        }
+        U64 generateMoves (PieceType pieceType, int position);
+        
 
 };
+
+// Generate all possible moves
+U64 MoveGenerator::generateMoves(PieceType pieceType, int position) {
+
+    // Return the generated moves based on the pieceType 
+    switch (pieceType) {
+
+        // Black Pieces
+        case PieceType::BP:
+            return generatePawnMoves(position, false);
+        case PieceType::BR:
+            return generateRookMoves(position, false);
+        case PieceType::BB:
+            return generateBishopMoves(position, false);
+        case PieceType::BN:
+            return generateKnightMoves(position, false);
+        case PieceType::BQ:
+            return generateQueenMoves(position, false);
+        case PieceType::BK:
+            return generateKingMoves(position, false);
+
+        // White Pieces
+        case PieceType::WP:
+            return generatePawnMoves(position, true);
+        case PieceType::WR:
+            return generateRookMoves(position, true);
+        case PieceType::WB:
+            return generateBishopMoves(position, true);
+        case PieceType::WN:
+            return generateKnightMoves(position, true);
+        case PieceType::WQ:
+            return generateQueenMoves(position, true);
+        case PieceType::WK:
+            return generateKingMoves(position,  true);
+
+        default:
+            return 0;
+
+    }
+
+}
 
 
 // Check where this has been implemented for future.... calling each time is def not efficient.  
@@ -126,7 +117,6 @@ MoveGenerator::MoveGenerator(Board& board) : chessBoard(board) {
 }
 
 U64 MoveGenerator::generatePawnMoves (int position, bool isWhite) {
-    updatePieces();
 
     U64 currentPawn = 1ULL << position;
     U64 validMoves = 0;
@@ -167,7 +157,6 @@ U64 MoveGenerator::generatePawnMoves (int position, bool isWhite) {
 }
 
 U64 MoveGenerator::generateKnightMoves (int position, bool isWhite) {
-    updatePieces();
 
     U64 currentKnight = 1ULL << position;
     U64 validMoves = 0;
@@ -202,7 +191,6 @@ U64 MoveGenerator::generateKnightMoves (int position, bool isWhite) {
 }
 
 U64 MoveGenerator::generateRookMoves (int position, bool isWhite) {
-    updatePieces();
 
     // There are more efficent methods for calculating the moves of sliding pieces
     // I.e., Magic bitboards... could be implemented after project is fully functional
@@ -249,8 +237,6 @@ U64 MoveGenerator::generateRookMoves (int position, bool isWhite) {
 
 U64 MoveGenerator::generateBishopMoves (int position, bool isWhite) {
 
-    updatePieces();
-
     U64 validMoves = 0;
     U64 ownPieces = isWhite ? whitePieces : blackPieces;
 
@@ -291,8 +277,6 @@ U64 MoveGenerator::generateQueenMoves (int position, bool isWhite) {
 }
 
 U64 MoveGenerator::generateKingMoves (int position, bool isWhite) {
-
-    updatePieces();
 
     U64 currentKing = 1ULL << position;
     U64 validMoves = 0;

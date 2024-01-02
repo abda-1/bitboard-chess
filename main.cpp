@@ -28,7 +28,7 @@ int main(int argc, char *argv[]){
 
     // Initialise Game
     Board chessBoard;
-    MoveGenerator moveGenerator(chessBoard);   // think abt this does it need to be reference
+    MoveGenerator moveGenerator(chessBoard);
     Game game;
     UI ui(renderer, &chessBoard, SQUARE_SIZE);
     ui.loadImages();
@@ -75,7 +75,7 @@ SDL_Renderer* createRenderer(SDL_Window* window) {
 }
 
 // Handle mouse down events
-void handleMouseDown (int mouseX, int mouseY, PieceType& selectedPiece, int& selectedPieceX, int& selectedPieceY, Board& chessBoard) {
+void handleMouseDown (int mouseX, int mouseY, PieceType& selectedPiece, int& selectedPieceX, int& selectedPieceY, Board& chessBoard, bool& isWhiteTurn) {
 
     // Convert mouse coordinates to bitboard position and chessboard coordinates
     int row = 7 - mouseY / SQUARE_SIZE;
@@ -95,9 +95,17 @@ void handleMouseDown (int mouseX, int mouseY, PieceType& selectedPiece, int& sel
 
     // Log the selected piece (to ensure valid piece was selected)
     if(selectedPiece != PieceType::EMPTY){
-        std::cout << "Selected " << pieceTypeToString(selectedPiece) << " at: " << row << ", " << col << endl;
-        
+
+        bool isWhitePiece = pieceTypeToString(selectedPiece)[0] == 'W';
+
+        // Deselect invalid piece
+        if ((isWhitePiece && !isWhiteTurn) || (!isWhitePiece && isWhiteTurn)) {
+            selectedPiece = PieceType::EMPTY;
+            return;
+        }
+
         // Print
+        std::cout << "Selected " << pieceTypeToString(selectedPiece) << " at: " << row << ", " << col << endl;        
         cout << "Selected Bit Pos: " << bitPos << endl;
         chessBoard.printU64(mask);
     }
@@ -105,7 +113,7 @@ void handleMouseDown (int mouseX, int mouseY, PieceType& selectedPiece, int& sel
 }
 
 // Handle mouse up events
-void handleMouseUp (int releaseX, int releaseY, PieceType& selectedPiece, int& selectedPieceX, int& selectedPieceY, Board& chessBoard, MoveGenerator& moveGenerator) {
+void handleMouseUp (int releaseX, int releaseY, PieceType& selectedPiece, int& selectedPieceX, int& selectedPieceY, Board& chessBoard, MoveGenerator& moveGenerator, bool& isWhiteTurn) {
 
     // Convert mouse coordinates to bitboard position and chessboard coordinates
     int releaseRow = 7 - releaseY / SQUARE_SIZE;
@@ -125,8 +133,13 @@ void handleMouseUp (int releaseX, int releaseY, PieceType& selectedPiece, int& s
     // If move is valid, execute move
     if (validMoves & releaseMask) {
         chessBoard.executeMove(selectedPiece, selectedPieceY * 8 + selectedPieceX, releaseBitPos);
-        
+        moveGenerator.updatePieces();
+
+        // Switch turn only after valid move
+        isWhiteTurn = !isWhiteTurn;
+
         // Print
+        std::cout << "Moved " << pieceTypeToString(selectedPiece) << " to: " << releaseRow << ", " << releaseCol << endl;        
         cout << "Release Bit Pos: " << releaseBitPos << endl;
         chessBoard.printU64(1ULL << releaseBitPos);
 
@@ -143,6 +156,7 @@ void gameLoop (SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGen
     PieceType selectedPiece;
     int selectedPieceX, selectedPieceY;
     U64 validMoves = 0;
+    bool isWhiteTurn = true;
 
     while(true){
         
@@ -157,7 +171,7 @@ void gameLoop (SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGen
             else if (windowEvent.type == SDL_MOUSEBUTTONDOWN) {
                 int mouseX, mouseY;
                 SDL_GetMouseState(&mouseX, &mouseY);
-                handleMouseDown(mouseX, mouseY, selectedPiece, selectedPieceX, selectedPieceY, chessBoard);
+                handleMouseDown(mouseX, mouseY, selectedPiece, selectedPieceX, selectedPieceY, chessBoard, isWhiteTurn);
                 if (selectedPiece != PieceType::EMPTY) {
                     validMoves = moveGenerator.generateMoves(selectedPiece, selectedPieceY * 8 + selectedPieceX);
                 }
@@ -168,7 +182,7 @@ void gameLoop (SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGen
                        
                 int releaseX, releaseY;
                 SDL_GetMouseState(&releaseX, &releaseY);
-                handleMouseUp(releaseX, releaseY, selectedPiece, selectedPieceX, selectedPieceY, chessBoard, moveGenerator);
+                handleMouseUp(releaseX, releaseY, selectedPiece, selectedPieceX, selectedPieceY, chessBoard, moveGenerator, isWhiteTurn);
                 selectedPiece = PieceType::EMPTY;
                 validMoves = 0;
 

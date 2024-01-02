@@ -209,11 +209,11 @@ void gameLoop (SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGen
             int x = kingCol * SQUARE_SIZE;
             int y = (7 - kingRow) * SQUARE_SIZE;
 
-            // Set the color for the rectangle (e.g., red)
-            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // RGBA
+            // Set the color for the rectangle
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 
             SDL_Rect rect = {x, y, SQUARE_SIZE, SQUARE_SIZE};
-            SDL_RenderDrawRect(renderer, &rect); // or SDL_RenderFillRect for a filled rectangle
+            SDL_RenderDrawRect(renderer, &rect);
         }
 
         SDL_RenderPresent(renderer);

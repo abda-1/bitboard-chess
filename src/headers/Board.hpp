@@ -1,9 +1,3 @@
-/*
-
-    - comprised of the 12 individual bitboards 
-
-*/
-
 #ifndef BOARD_H
 #define BOARD_H
 
@@ -24,14 +18,14 @@ class Board{
 
     public:
         Board();
-        
+
         // Board move helpers
         void movePiece(PieceType type, int fromPos, int toPos);
         void capturePiece(PieceType type, int position);
         void executeMove(PieceType selectedPiece, int fromPos, int toPos);
         bool isOpponentPiece(PieceType pieceOne, PieceType pieceTwo);
 
-        // utility 
+        // Utility 
         PieceType getPieceAtPosition (int position);
         void clearBoard();
         void printU64(U64 board);

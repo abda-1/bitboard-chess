@@ -1,0 +1,7 @@
+{
+    "terminal.integrated.defaultProfile.osx": "",
+    "cmake.configureOnOpen": true,
+    "files.associations": {
+        "xlocale": "cpp"
+    }
+}

@@ -12,9 +12,9 @@
         - will take in 12 individual bitboards representing the chessBoard.
         - will generate moves for each piece type and then return the package of boards as an unordered_map
 
-
 */
 
+// Constants to assist with preventing generating moves that 'wrap' around the board
 const U64 RANK_8 = 0xFF00000000000000;
 const U64 RANK_7 = 0x00FF000000000000;
 const U64 RANK_2 = 0x000000000000FF00;
@@ -31,10 +31,6 @@ class MoveGenerator{
     private:
         Board& chessBoard;
         U64 whitePieces, blackPieces;
-        
-    public:
-        MoveGenerator(Board& board);
-        void updatePieces();
 
         U64 generateWhitePawn(int position);
         U64 generateBlackPawn(int position);
@@ -53,18 +49,64 @@ class MoveGenerator{
         
         U64 generateWhiteKing(int position);
         U64 generateBlackKing(int position);
+        
+    public:
+        MoveGenerator(Board& board);
+        void updatePieces();
+
+        U64 generateMoves(PieceType pieceType, int position) {
+
+            // Return the generated moves based on the pieceType 
+            switch (pieceType) {
+
+                // Black Pieces
+                case PieceType::BP:
+                    return generateBlackPawn(position);
+                case PieceType::BR:
+                    return generateBlackRook(position);
+                case PieceType::BB:
+                    return generateBlackBishop(position);
+                case PieceType::BN:
+                    return generateBlackKnight(position);
+                case PieceType::BQ:
+                    return generateBlackQueen(position);
+                case PieceType::BK:
+                    return generateBlackKing(position);
+
+                // White Pieces
+                case PieceType::WP:
+                    return generateWhitePawn(position);
+                case PieceType::WR:
+                    return generateWhiteRook(position);
+                case PieceType::WB:
+                    return generateWhiteBishop(position);
+                case PieceType::WN:
+                    return generateWhiteKnight(position);
+                case PieceType::WQ:
+                    return generateWhiteQueen(position);
+                case PieceType::WK:
+                    return generateWhiteKing(position);
+
+                default:
+                    return 0;
+            
+            }
+
+        }
 
 };
 
+
 void MoveGenerator::updatePieces() {
 
-    whitePieces = 0;
-    blackPieces = 0;
+    // Intialise both boards to be null
+    whitePieces = 0; blackPieces = 0;
 
+    // Iterate through every board and append to whitePieces or blackPieces
     for(const auto& [type, bitboard] : chessBoard.getCurrentBoard()) {
         char colour = pieceTypeToString(type)[0];
 
-        if(colour == 'W') {
+        if (colour == 'W') {
             whitePieces |= bitboard;
         }
 
@@ -78,7 +120,7 @@ void MoveGenerator::updatePieces() {
 
 MoveGenerator::MoveGenerator(Board& board) : chessBoard(board) {
 
-    // initialise white pieces board and black pieces board.
+    // Initialise white pieces board and black pieces board.
     U64 white = 0, black = 0;
 
     for(const auto& [type, bitb] : board.getCurrentBoard()){

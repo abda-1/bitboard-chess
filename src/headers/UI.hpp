@@ -1,13 +1,12 @@
-#ifndef UI_H
-#define UI_H
+#ifndef UI_HPP
+#define UI_HPP
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-
+#include <SDL.h>
+#include <SDL_image.h>
 #include <PieceType.hpp>
 #include <TextureManager.hpp>
 #include <Board.hpp>
-
+#include <BitOperations.hpp>
 #include <unordered_map>
 
 using namespace std;
@@ -43,10 +42,12 @@ class UI{
         void drawPieces();
         void loadImages();
 
+        void drawValidMoves(U64 validMoves);
+        void drawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, int radius);
+
         // void drawCircle(int centreX, int centreY, int radius);
         // void drawValidMoves();
         // void setValidMoves(U64 moves);
-
 
         // copy constructor and copy assignment operators should not be allowed
         UI(const UI&) = delete;
@@ -54,44 +55,39 @@ class UI{
         
 };
 
-// void UI::setValidMoves(U64 moves){
-//     currentValidMoves = moves;
-// }
+void UI::drawValidMoves (U64 validMoves) {
+    SDL_SetRenderDrawColor (renderer, 209, 213, 183, SDL_ALPHA_OPAQUE);
+    int radius = SQUARE_SIZE/6;
+    while (validMoves) {
 
-// void UI::drawCircle(int centreX, int centreY, int radius){
+        int index = findLSBIndex(validMoves);
+        if (index == -1) break;
 
-//     for (int w = 0; w < radius * 2; w++) {
-//         for (int h = 0; h < radius * 2; h++) {
-//             int dx = radius - w;
-//             int dy = radius - h;
+        // Clear the bit that was just found
+        validMoves &= ~(1ULL << index);
+    
+        int row = index / 8;
+        int col = index % 8;
+        int x = col * SQUARE_SIZE + SQUARE_SIZE/2;
+        int y = (7 - row) * SQUARE_SIZE + SQUARE_SIZE/2;
 
-//             if((dx*dx + dy*dy) <= (radius * radius)){
-//                 SDL_RenderDrawPoint(renderer, centreX + dx, centreY + dy);
-//             }
-//         }
-//     }
+        drawFilledCircle(renderer, x, y, radius);
+    
+    }
 
-// }
+}
 
-// void UI::drawValidMoves() {
-
-//     U64 mask = 1ULL;
-
-//     for(int i = 0; i < 64; i++, mask <<= 1) {
-//         if (currentValidMoves & mask) {
-//             int row = 7 - (i/8);
-//             int col = i % 8;
-
-//             int x = col * SQUARE_SIZE + (SQUARE_SIZE / 2);
-//             int y = row * SQUARE_SIZE + (SQUARE_SIZE / 2);
-//             int radius = SQUARE_SIZE / 4;
-
-//             SDL_SetRenderDrawColor(renderer, 209, 213, 183, 255); // grey
-//             drawCircle(x, y, radius);
-//         }
-//     }
-
-// }
+void UI::drawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, int radius) {
+    for (int w = 0; w < radius * 2; w++) {
+        for (int h = 0; h < radius * 2; h++) {
+            int dx = radius - w; // horizontal offset
+            int dy = radius - h; // vertical offset
+            if ((dx * dx + dy * dy) <= (radius * radius)) {
+                SDL_RenderDrawPoint(renderer, centerX + dx, centerY + dy);
+            }
+        }
+    }
+}
 
 void UI::setSquareSize(int SQ_SIZE){
     SQUARE_SIZE = SQ_SIZE;
@@ -184,4 +180,4 @@ void UI::drawPieces(){
 
 }
 
-#endif  // UI_H
+#endif  // UI_HPP

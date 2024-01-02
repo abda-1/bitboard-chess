@@ -24,37 +24,66 @@ class Board{
 
     public:
         Board();
-
-        unordered_map<PieceType, U64> getCurrentBoard();
-        void movePiece(PieceType type, int fromPos, int toPos);
-        void capturePiece(PieceType type, int position);
-
-        bool isOpponentPiece(PieceType piece1, PieceType piece2);
-        
-        // helper
-        void printU64(U64 board);
-
         void clearBoard();
 
+        unordered_map<PieceType, U64> getCurrentBoard();
 
+        void movePiece(PieceType type, int fromPos, int toPos);
+        void capturePiece(PieceType type, int position);
+        void executeMove(PieceType selectedPiece, int fromPos, int toPos);
+        bool isOpponentPiece(PieceType piece1, PieceType piece2);
 
+        PieceType getPieceAtPosition (int position);
+
+        void printU64(U64 board);
+        
 };
+
+void Board::executeMove (PieceType selectedPiece, int fromPos, int toPos) {
+
+    // Check if move is a capture move
+    PieceType capturedPiece = getPieceAtPosition(toPos);
+    if (capturedPiece != PieceType::EMPTY && isOpponentPiece(selectedPiece, capturedPiece)) {
+        capturePiece(capturedPiece, toPos);
+    }
+
+    // Move the piece
+    movePiece(selectedPiece, fromPos, toPos);
+
+}
+
+PieceType Board::getPieceAtPosition (int position) {
+
+    U64 location = 1ULL << position;
+
+    // Iterate through each board type
+    for (const auto& [type, bitboard] : currentBoard) {
+        if (bitboard & location) {
+            return type;
+        }
+    }
+
+    return PieceType::EMPTY;
+}
+
+
+
 
 void Board::clearBoard(){
 
-    for(auto& [type, bb] : currentBoard){
-        bb = 0;
+    for(auto& [type, bitboard] : currentBoard){
+        bitboard = 0;
     }
 
 }
 
-bool Board::isOpponentPiece(PieceType piece1, PieceType piece2){
+bool Board::isOpponentPiece(PieceType pieceOne, PieceType pieceTwo){
 
-    // obtain the type of the first piece:
-    char colour1 = pieceTypeToString(piece1)[0];
-    char colour2 = pieceTypeToString(piece2)[0];
+    // Obtain types of pieces through helper function
+    char colourOne = pieceTypeToString(pieceOne)[0];
+    char colourTwo = pieceTypeToString(pieceTwo)[0];
 
-    return colour1 != colour2;
+    return colourOne != colourTwo;
     
 }
 
@@ -65,7 +94,7 @@ void Board::capturePiece(PieceType type, int position){
         U64& bitboard = currentBoard[type];
         U64 mask = 1ULL << position;
         
-        // clear the bit at the position
+        // Clear the bit at the position
         bitboard &= ~mask;
     }
 
@@ -77,17 +106,17 @@ void Board::movePiece(PieceType type, int fromPos, int toPos){
     U64 fromMask = 1ULL << fromPos;
     U64 toMask = 1ULL << toPos;
     
-    // clear the bit at the original position
+    // Clear the bit at the original location
     bitboard &= ~fromMask;
 
-    // set the bit at the new position
+    // Set the bit at the new location
     bitboard |= toMask;
 
 
 }
 
 
-// helper
+// Print the board (debugging purposes)
 void Board::printU64(U64 board){
 
     for(int rank = 8; rank >= 1; rank--) {

@@ -1,8 +1,10 @@
 
 #include "Board.hpp"
-#include "MoveGenerator.hpp"
 #include <cassert>
 #include <iostream>
+#include <AudioManager.hpp>
+#include <SDL.h>
+#include <SDL_mixer.h>
 
 void print(U64 board){
     for(int rank = 8; rank >= 1; rank--) {
@@ -14,21 +16,9 @@ void print(U64 board){
     }
 }
 
-void testMoveGeneration() {
 
-    Board board;
-    board.clearBoard();
 
-    MoveGenerator mg(board);
-    
-    U64 validMoves = 0;
-
-}
-
-int main(){
-
-    testMoveGeneration();
-
+int main(int argc, char* argv[]) {
+    AudioManager audio;
     return 0;
-
 }

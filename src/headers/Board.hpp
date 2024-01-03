@@ -5,6 +5,7 @@
 #include <PieceType.hpp>
 #include <unordered_map>
 #include <iostream>
+#include <AudioManager.hpp>
 
 using namespace std;
 typedef uint64_t U64;
@@ -15,9 +16,10 @@ class Board{
     private:
         unordered_map<PieceType, U64> currentBoard;
         void initialiseBoard();
+        AudioManager& audioManager;
 
     public:
-        Board();
+        Board(AudioManager& audioManager);
 
         // Board move helpers
         void movePiece(PieceType type, int fromPos, int toPos);
@@ -34,8 +36,9 @@ class Board{
         
 };
 
-Board::Board(){
+Board::Board(AudioManager& a) : audioManager(a) {
     initialiseBoard();
+    a.playSound(AudioType::START);
 }
 
 void Board::executeMove (PieceType selectedPiece, int fromPos, int toPos) {
@@ -44,10 +47,12 @@ void Board::executeMove (PieceType selectedPiece, int fromPos, int toPos) {
     PieceType capturedPiece = getPieceAtPosition(toPos);
     if (capturedPiece != PieceType::EMPTY && isOpponentPiece(selectedPiece, capturedPiece)) {
         capturePiece(capturedPiece, toPos);
+        movePiece(selectedPiece, fromPos, toPos);
+        audioManager.playSound(AudioType::CAPTURE);
+    } else {
+        movePiece(selectedPiece, fromPos, toPos);
+        audioManager.playSound(AudioType::MOVE);
     }
-
-    // Move the piece
-    movePiece(selectedPiece, fromPos, toPos);
 
 }
 
@@ -93,7 +98,6 @@ void Board::capturePiece(PieceType type, int position){
         // Clear the bit at the position
         bitboard &= ~mask;
     }
-
 }
 
 void Board::movePiece(PieceType type, int fromPos, int toPos){
@@ -107,7 +111,6 @@ void Board::movePiece(PieceType type, int fromPos, int toPos){
 
     // Set the bit at the new location
     bitboard |= toMask;
-
 }
 
 // Print the board (debugging purposes)

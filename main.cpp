@@ -4,6 +4,7 @@
 #include <Board.hpp>
 #include <MoveGenerator.hpp>
 #include <Game.hpp>
+#include <AudioManager.hpp>
 
 const int SQUARE_SIZE = 75;
 const int BOARD_SIZE = 8;
@@ -11,7 +12,7 @@ const int BOARD_SIZE = 8;
 bool initSDL();
 SDL_Window* createWindow();
 SDL_Renderer* createRenderer(SDL_Window* window);
-void gameLoop(SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGenerator, Game& game, UI& ui);
+void gameLoop(SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGenerator, Game& game, UI& ui, AudioManager& audioManager);
 
 int main(int argc, char *argv[]){
 
@@ -27,14 +28,15 @@ int main(int argc, char *argv[]){
     if (!renderer) return -1;
 
     // Initialise Game
-    Board chessBoard;
+    AudioManager audioManager;
+    Board chessBoard(audioManager);
     MoveGenerator moveGenerator(chessBoard);
     Game game;
     UI ui(renderer, &chessBoard, SQUARE_SIZE);
     ui.loadImages();
 
     // Main Game
-    gameLoop(renderer, chessBoard, moveGenerator, game, ui);
+    gameLoop(renderer, chessBoard, moveGenerator, game, ui, audioManager);
 
     // Cleanup
     SDL_DestroyRenderer(renderer);
@@ -113,7 +115,7 @@ void handleMouseDown (int mouseX, int mouseY, PieceType& selectedPiece, int& sel
 }
 
 // Handle mouse up events
-void handleMouseUp (int releaseX, int releaseY, PieceType& selectedPiece, int& selectedPieceX, int& selectedPieceY, Board& chessBoard, MoveGenerator& moveGenerator, bool& isWhiteTurn) {
+void handleMouseUp (int releaseX, int releaseY, PieceType& selectedPiece, int& selectedPieceX, int& selectedPieceY, Board& chessBoard, MoveGenerator& moveGenerator, bool& isWhiteTurn, AudioManager& audioManager) {
 
     // Convert mouse coordinates to bitboard position and chessboard coordinates
     int releaseRow = 7 - releaseY / SQUARE_SIZE;
@@ -147,11 +149,18 @@ void handleMouseUp (int releaseX, int releaseY, PieceType& selectedPiece, int& s
         std::cout << "Invalid move!" << std::endl;
     }
 
+    if (moveGenerator.isKingInCheck(isWhiteTurn)) {
+        // Play check sound
+        audioManager.playSound(AudioType::CHECK);
+    }
+
+
+
 }
 
 
 
-void gameLoop (SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGenerator, Game& game, UI& ui) {
+void gameLoop (SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGenerator, Game& game, UI& ui, AudioManager& audioManager) {
     SDL_Event windowEvent;
     PieceType selectedPiece;
     int selectedPieceX, selectedPieceY;
@@ -182,7 +191,7 @@ void gameLoop (SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGen
                        
                 int releaseX, releaseY;
                 SDL_GetMouseState(&releaseX, &releaseY);
-                handleMouseUp(releaseX, releaseY, selectedPiece, selectedPieceX, selectedPieceY, chessBoard, moveGenerator, isWhiteTurn);
+                handleMouseUp(releaseX, releaseY, selectedPiece, selectedPieceX, selectedPieceY, chessBoard, moveGenerator, isWhiteTurn, audioManager);
                 selectedPiece = PieceType::EMPTY;
                 validMoves = 0;
 
@@ -200,6 +209,7 @@ void gameLoop (SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGen
 
         // Check if the king is in check and draw a rectangle if it is
         if (moveGenerator.isKingInCheck(isWhiteTurn)) {
+
             U64 kingBoard = isWhiteTurn ? chessBoard.getCurrentBoard()[PieceType::WK] : chessBoard.getCurrentBoard()[PieceType::BK];
             int kingPosition = findLSBIndex(kingBoard);
             int kingRow = kingPosition / 8;

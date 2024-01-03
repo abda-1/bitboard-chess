@@ -7,7 +7,7 @@ CC = g++
 CXXFLAGS = -std=c++17 -Wall
 INCLUDES = -Isrc/include/SDL2 -Isrc/headers
 LDFLAGS = -Lsrc/lib
-LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
+LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer
 
 # Makefile settings
 MAINAPP = chess

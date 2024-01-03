@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <PieceType.hpp>
 #include <Board.hpp>
+#include <BitOperations.hpp>
 
 // Constants to assist with preventing generating moves that 'wrap' around the board
 const U64 RANK_8 = 0xFF00000000000000;

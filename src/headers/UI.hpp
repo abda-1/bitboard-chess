@@ -103,20 +103,20 @@ void UI::loadImages(){
     // error handling has not been placed in yet. 
 
     // black pieces
-    textureManager.loadTexture(PieceType::BP, "src/assets/bp.png");
-    textureManager.loadTexture(PieceType::BR, "src/assets/br.png");
-    textureManager.loadTexture(PieceType::BB, "src/assets/bb.png");
-    textureManager.loadTexture(PieceType::BN, "src/assets/bn.png");
-    textureManager.loadTexture(PieceType::BQ, "src/assets/bq.png");
-    textureManager.loadTexture(PieceType::BK, "src/assets/bk.png");
+    textureManager.loadTexture(PieceType::BP, "src/assets/textures/bp.png");
+    textureManager.loadTexture(PieceType::BR, "src/assets/textures/br.png");
+    textureManager.loadTexture(PieceType::BB, "src/assets/textures/bb.png");
+    textureManager.loadTexture(PieceType::BN, "src/assets/textures/bn.png");
+    textureManager.loadTexture(PieceType::BQ, "src/assets/textures/bq.png");
+    textureManager.loadTexture(PieceType::BK, "src/assets/textures/bk.png");
     
     // white pieces
-    textureManager.loadTexture(PieceType::WP, "src/assets/wp.png");
-    textureManager.loadTexture(PieceType::WR, "src/assets/wr.png");
-    textureManager.loadTexture(PieceType::WB, "src/assets/wb.png");
-    textureManager.loadTexture(PieceType::WN, "src/assets/wn.png");
-    textureManager.loadTexture(PieceType::WQ, "src/assets/wq.png");
-    textureManager.loadTexture(PieceType::WK, "src/assets/wk.png");
+    textureManager.loadTexture(PieceType::WP, "src/assets/textures/wp.png");
+    textureManager.loadTexture(PieceType::WR, "src/assets/textures/wr.png");
+    textureManager.loadTexture(PieceType::WB, "src/assets/textures/wb.png");
+    textureManager.loadTexture(PieceType::WN, "src/assets/textures/wn.png");
+    textureManager.loadTexture(PieceType::WQ, "src/assets/textures/wq.png");
+    textureManager.loadTexture(PieceType::WK, "src/assets/textures/wk.png");
 
 }
 

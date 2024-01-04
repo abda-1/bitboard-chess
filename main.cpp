@@ -115,8 +115,6 @@ void handleMouseDown (int mouseX, int mouseY, PieceType& selectedPiece, int& sel
 // Handle mouse up events
 void handleMouseUp (int releaseX, int releaseY, PieceType& selectedPiece, int& selectedPieceX, int& selectedPieceY, Board& chessBoard, MoveGenerator& moveGenerator, bool& isWhiteTurn, AudioManager& audioManager, U64& validMoves) {
 
-
-
     // Convert mouse coordinates to bitboard position and chessboard coordinates
     int releaseRow = 7 - releaseY / SQUARE_SIZE;
     int releaseCol = releaseX / SQUARE_SIZE;
@@ -132,9 +130,14 @@ void handleMouseUp (int releaseX, int releaseY, PieceType& selectedPiece, int& s
     int selectedPiecePos = selectedPieceY * 8 + selectedPieceX;
 
     if (releaseBitPos == selectedPiecePos){
-        // cout << "Tried not to print" << endl;
         return;
     }
+
+    // if (validMoves == 0 && moveGenerator.isKingInCheck(isWhiteTurn)){
+    //     audioManager.playSound(AudioType::CHECKMATE);
+    //     return;
+    // }
+
 
     // If move is valid, execute move
     if (validMoves & releaseMask) {

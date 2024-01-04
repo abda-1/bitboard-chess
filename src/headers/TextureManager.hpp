@@ -14,7 +14,8 @@ using namespace std;
 class TextureManager{
 
     private:
-        std::unordered_map<PieceType, SDL_Texture*> textures;   // set up map for piecetype and corresponding (current) texture
+        // Set up map for piecetype and corresponding (current) texture
+        std::unordered_map<PieceType, SDL_Texture*> textures;
         SDL_Renderer* renderer;
 
     public:
@@ -25,7 +26,7 @@ class TextureManager{
         SDL_Texture* getTexture(PieceType type);
         void clearTexture(PieceType type);
 
-        // copy constructor and copy assignment operators should not be allowed
+        // Copy constructor and copy assignment operators should not be allowed
         TextureManager(const TextureManager&) = delete;
         TextureManager& operator=(const TextureManager&) = delete;
 

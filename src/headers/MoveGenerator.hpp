@@ -94,7 +94,7 @@ U64 MoveGenerator::generatePieceValidMoves(PieceType pieceType, int position) {
 
         // Simulate the move being executed
         Board tempBoard = chessBoard;
-        tempBoard.executeMove(pieceType, position, toPos);  // Fix sound issue here ? 
+        tempBoard.simulateExecuteMove(pieceType, position, toPos);
         updatePieces(tempBoard);
         
         if (!isKingInCheck(isWhite, tempBoard)) validMoves |= (1ULL << toPos);

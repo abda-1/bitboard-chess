@@ -29,8 +29,6 @@ class UI{
         SDL_Renderer* renderer;
         Board* board;
 
-        // U64 currentValidMoves;
-
         void setSquareSize(int SQ_SIZE);
 
     public:
@@ -45,11 +43,7 @@ class UI{
         void drawValidMoves(U64 validMoves);
         void drawFilledCircle(SDL_Renderer* renderer, int centerX, int centerY, int radius);
 
-        // void drawCircle(int centreX, int centreY, int radius);
-        // void drawValidMoves();
-        // void setValidMoves(U64 moves);
-
-        // copy constructor and copy assignment operators should not be allowed
+        // Copy constructor and copy assignment operators should not be allowed
         UI(const UI&) = delete;
         UI& operator=(const UI&) = delete;
         
@@ -100,9 +94,9 @@ int UI::getBoardSize(){
 
 void UI::loadImages(){
 
-    // error handling has not been placed in yet. 
+    // Error handling has not been placed in yet. 
 
-    // black pieces
+    // Black pieces
     textureManager.loadTexture(PieceType::BP, "src/assets/textures/bp.png");
     textureManager.loadTexture(PieceType::BR, "src/assets/textures/br.png");
     textureManager.loadTexture(PieceType::BB, "src/assets/textures/bb.png");
@@ -110,7 +104,7 @@ void UI::loadImages(){
     textureManager.loadTexture(PieceType::BQ, "src/assets/textures/bq.png");
     textureManager.loadTexture(PieceType::BK, "src/assets/textures/bk.png");
     
-    // white pieces
+    // White pieces
     textureManager.loadTexture(PieceType::WP, "src/assets/textures/wp.png");
     textureManager.loadTexture(PieceType::WR, "src/assets/textures/wr.png");
     textureManager.loadTexture(PieceType::WB, "src/assets/textures/wb.png");
@@ -131,11 +125,14 @@ void UI::drawChessboard(){
     for(int i = 0; i < 8; i++){
         for(int j = 0; j < 8; j++){
 
-            if ((i+j) % 2 == 0) SDL_SetRenderDrawColor(renderer,233,237,204,255);  // colour 1
-            else                SDL_SetRenderDrawColor(renderer,119,153,84,255);   // colour 2
+            if ((i+j) % 2 == 0) SDL_SetRenderDrawColor(renderer,233,237,204,255);  // Colour 1
+            else                SDL_SetRenderDrawColor(renderer,119,153,84,255);   // Colour 2
 
-            square.x = j * SQUARE_SIZE;                     // x-coordinate of square
-            square.y = i * SQUARE_SIZE;                     // y-coordinate of square
+            // X-coordinate of square
+            square.x = j * SQUARE_SIZE;                     
+
+            // Y-coordinate of square
+            square.y = i * SQUARE_SIZE;                     
 
             SDL_RenderFillRect(renderer, &square);
         }
@@ -145,17 +142,17 @@ void UI::drawChessboard(){
 
 void UI::drawPieces(){
 
-    // recall that piece textures are stored in the textures map in textureManager.
+    // Recall that piece textures are stored in the textures map in textureManager.
 
     for(const auto& [type, bb] : board->getCurrentBoard()){
 
         U64 mask = 1ULL;
         for(int i = 0; i < 64; i++, mask <<= 1){
             
-            // if there is an active bit at the current location, a piece exists!
+            // If there is an active bit at the current location, a piece exists!
             if(bb & mask){
 
-                // calculate coordinates in terms of row and col, and then convert to pixel coordinates.
+                // Calculate coordinates in terms of row and col, and then convert to pixel coordinates.
 
                 int row = 7 - (i / 8);
                 int col = i % 8;
@@ -163,15 +160,13 @@ void UI::drawPieces(){
                 int x = col * SQUARE_SIZE;
                 int y = row * SQUARE_SIZE;
 
-                // now obtain the texture for this piece and then draw on screen
+                // Now obtain the texture for this piece and then draw on screen
                 SDL_Texture* texture = textureManager.getTexture(type);
                 SDL_Rect destRect = {x, y, SQUARE_SIZE, SQUARE_SIZE};
 
                 if(texture){
                     SDL_RenderCopy(renderer, texture, nullptr, &destRect);
                 }
-
-                // cout << "PieceType: " << pieceTypeToString(type) << " drawn at: (" << row << " , " << col << ")." << endl; 
 
             }
         

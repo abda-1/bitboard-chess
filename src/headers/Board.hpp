@@ -10,33 +10,31 @@
 using namespace std;
 typedef uint64_t U64;
 
-// Default starting setup
-
 class Board{
 
     private:
         unordered_map<PieceType, U64> currentBoard;
-        void initialiseBoard();
         AudioManager& audioManager;
+
+        void initialiseBoard();
+
+        // Move Helpers
+        void movePiece(PieceType type, int fromPos, int toPos);
+        void capturePiece(PieceType type, int position);
 
     public:
         Board(AudioManager& audioManager);
-        Board(AudioManager& a, unordered_map<PieceType,U64> customBoard);
 
-        // Board move helpers
-        void movePiece(PieceType type, int fromPos, int toPos);
-        void capturePiece(PieceType type, int position);
-        void executeMove(PieceType selectedPiece, int fromPos, int toPos);
+        unordered_map<PieceType, U64> getCurrentBoard();
+        PieceType getPieceAtPosition (int position);
         bool isOpponentPiece(PieceType pieceOne, PieceType pieceTwo);
 
-        // Utility 
-        PieceType getPieceAtPosition (int position);
+        void executeMove(PieceType selectedPiece, int fromPos, int toPos);
+        void simulateExecuteMove (PieceType selectedPiece, int fromPos, int toPos);
+                
+        // Testing functions
         void clearBoard();
         void printU64(U64 board);
-        unordered_map<PieceType, U64> getCurrentBoard();
-
-        // Custom board creation
-        // Testing functions
         void addPiece(PieceType type, int position);
         void removePiece (PieceType type, int position);
         
@@ -55,11 +53,6 @@ Board::Board(AudioManager& a) : audioManager(a) {
     a.playSound(AudioType::START);
 }
 
-Board::Board(AudioManager& a, unordered_map<PieceType,U64> customBoard) : audioManager(a) {
-    currentBoard = customBoard;
-    a.playSound(AudioType::START);
-}
-
 void Board::executeMove (PieceType selectedPiece, int fromPos, int toPos) {
 
     // Check if move is a capture move
@@ -71,6 +64,19 @@ void Board::executeMove (PieceType selectedPiece, int fromPos, int toPos) {
     } else {
         movePiece(selectedPiece, fromPos, toPos);
         audioManager.playSound(AudioType::MOVE);
+    }
+
+}
+
+void Board::simulateExecuteMove (PieceType selectedPiece, int fromPos, int toPos) {
+
+    // Check if move is a capture move
+    PieceType capturedPiece = getPieceAtPosition(toPos);
+    if (capturedPiece != PieceType::EMPTY && isOpponentPiece(selectedPiece, capturedPiece)) {
+        capturePiece(capturedPiece, toPos);
+        movePiece(selectedPiece, fromPos, toPos);
+    } else {
+        movePiece(selectedPiece, fromPos, toPos);
     }
 
 }

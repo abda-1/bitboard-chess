@@ -19,23 +19,16 @@ const U64 FILE_B = 0x0202020202020200;
 const U64 FILE_G = 0x4040404040404040;
 const U64 FILE_H = 0x8080808080808080;
 
-/*
-Need to Modify:
->> attack generation should consider all possible moves -> return the squares that the piece can attack from 
-*/
-
-
-
 class MoveGenerator{
 
     private:
         Board& chessBoard;
         U64 whitePieces, blackPieces;
         
-        // Use a cache to prevent multiple recalculations of the same attacks upon each move
-        U64 moveCache;
-        U64 attackCache;
-        bool cacheUpToDate = false;
+        // // Use a cache to prevent multiple recalculations of the same attacks upon each move
+        // U64 moveCache;
+        // U64 attackCache;
+        // bool cacheUpToDate = false;
 
         // Move Generation
         // Returned BitBoard will include all possible locations that piece can be moved to.
@@ -46,25 +39,23 @@ class MoveGenerator{
         U64 generateQueenMoves(int position, bool isWhite, bool includeBlocker);
         U64 generateKingMoves(int position, bool isWhite, bool includeBlocker);
 
+        U64 generatePieceMovesOrAttacks (PieceType pieceType, int position, bool attack);
+        U64 generateAllMovesOrAttacks (bool isWhite, bool attack, Board& board);
+
         // includeblocker  -> return squares the piece can attack
         // !includeblocker -> return only the valid move squares
 
-        // ValidMove Detection Helpers
+        // Valid Move Detection Helpers
         std::vector<pair<PieceType, int>> findCheckingPieces(bool isWhite, Board& board);
         U64 generateLineOfAttack(int checkingPiecePosition, int kingPosition);
-
+        void updatePieces(Board& board);
+        bool isKingInCheck (bool isWhite, Board& currentBoard);
 
     public:
         MoveGenerator(Board& board);
 
         void updatePieces();
-        void updatePieces(Board& board);
-
-        bool isKingInCheck (bool isWhite, Board& currentBoard);
         bool isKingInCheck (bool isWhite);
-
-        U64 generatePieceMovesOrAttacks (PieceType pieceType, int position, bool attack);
-        U64 generateAllMovesOrAttacks (bool isWhite, bool attack, Board& board);
         U64 generatePieceValidMoves (PieceType pieceType, int position);
         
 };
@@ -103,7 +94,7 @@ U64 MoveGenerator::generatePieceValidMoves(PieceType pieceType, int position) {
 
         // Simulate the move being executed
         Board tempBoard = chessBoard;
-        tempBoard.executeMove(pieceType, position, toPos);
+        tempBoard.executeMove(pieceType, position, toPos);  // Fix sound issue here ? 
         updatePieces(tempBoard);
         
         if (!isKingInCheck(isWhite, tempBoard)) validMoves |= (1ULL << toPos);
@@ -111,54 +102,6 @@ U64 MoveGenerator::generatePieceValidMoves(PieceType pieceType, int position) {
         // Reset move execution
         whitePieces = oldWhitePieces;
         blackPieces = oldBlackPieces;
-
-        // // If the king is currently not in check -> check that a given move does not result in a check
-        // if (!kingInCheck) {
-
-        //     U64 oldWhitePieces = whitePieces;
-        //     U64 oldBlackPieces = blackPieces;
-
-        //     // Simulate the move being executed
-        //     Board tempBoard = chessBoard;
-        //     tempBoard.executeMove(pieceType, position, toPos);
-        //     updatePieces(tempBoard);
-            
-        //     if (!isKingInCheck(isWhite, tempBoard)) validMoves |= (1ULL << toPos);
-            
-        //     // Reset move execution
-        //     whitePieces = oldWhitePieces;
-        //     blackPieces = oldBlackPieces;
-
-        // }
-
-        // // If the king is already in check -> check whether a given move results in a removal of the check 
-        // else {
-
-        //     Board tempBoard = chessBoard;
-
-        //     // Find the pieces that are causing the check
-        //     std::vector<pair<PieceType, int>> checkingPieces = findCheckingPieces(isWhite, tempBoard);
-
-        //     if (checkingPieces.size() == 1) {
-
-        //         // If piece is non sliding, need to capture that piece
-        //         if (checkingPieces[0].first == PieceType::BP || checkingPieces[0].first == PieceType::WP || checkingPieces[0].first == PieceType::BN || checkingPieces[0].first == PieceType::WN) {
-        //             validMoves |= ((1ULL << toPos) & (1ULL << checkingPieces[0].second));
-        //         }
-
-        //         else {
-
-        //             // Find their line of attack
-        //             U64 kingBoard = isWhite ? tempBoard.getCurrentBoard()[PieceType::WK] : tempBoard.getCurrentBoard()[PieceType::BK];
-        //             int kingPos = findLSBIndex(kingBoard);
-        //             U64 lineOfAttack = generateLineOfAttack(checkingPieces[0].second, kingPos);
-
-        //             validMoves |= (lineOfAttack & (1ULL << toPos));
-        //         }
-
-        //     }
-            
-        // }
 
     }
 

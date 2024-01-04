@@ -3,7 +3,6 @@
 #include <UI.hpp>
 #include <Board.hpp>
 #include <MoveGenerator.hpp>
-#include <Game.hpp>
 #include <AudioManager.hpp>
 
 const int SQUARE_SIZE = 75;
@@ -12,7 +11,7 @@ const int BOARD_SIZE = 8;
 bool initSDL();
 SDL_Window* createWindow();
 SDL_Renderer* createRenderer(SDL_Window* window);
-void gameLoop(SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGenerator, Game& game, UI& ui, AudioManager& audioManager);
+void gameLoop(SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGenerator, UI& ui, AudioManager& audioManager);
 
 int main(int argc, char *argv[]){
 
@@ -31,12 +30,11 @@ int main(int argc, char *argv[]){
     AudioManager audioManager;
     Board chessBoard(audioManager);
     MoveGenerator moveGenerator(chessBoard);
-    Game game;
     UI ui(renderer, &chessBoard, SQUARE_SIZE);
     ui.loadImages();
 
     // Main Game
-    gameLoop(renderer, chessBoard, moveGenerator, game, ui, audioManager);
+    gameLoop(renderer, chessBoard, moveGenerator, ui, audioManager);
 
     // Cleanup
     SDL_DestroyRenderer(renderer);
@@ -165,7 +163,7 @@ void handleMouseUp (int releaseX, int releaseY, PieceType& selectedPiece, int& s
 
 
 
-void gameLoop (SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGenerator, Game& game, UI& ui, AudioManager& audioManager) {
+void gameLoop (SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGenerator, UI& ui, AudioManager& audioManager) {
     SDL_Event windowEvent;
     PieceType selectedPiece;
     int selectedPieceX, selectedPieceY;

@@ -5,9 +5,7 @@
 #include <unordered_map>
 
 enum class PieceType{
-
     BP, BR, BB, BN, BQ, BK, WP, WR, WB, WN, WQ, WK, EMPTY
-
 };
 
 std::string pieceTypeToString(PieceType type) {

@@ -115,7 +115,9 @@ void handleMouseDown (int mouseX, int mouseY, PieceType& selectedPiece, int& sel
 }
 
 // Handle mouse up events
-void handleMouseUp (int releaseX, int releaseY, PieceType& selectedPiece, int& selectedPieceX, int& selectedPieceY, Board& chessBoard, MoveGenerator& moveGenerator, bool& isWhiteTurn, AudioManager& audioManager) {
+void handleMouseUp (int releaseX, int releaseY, PieceType& selectedPiece, int& selectedPieceX, int& selectedPieceY, Board& chessBoard, MoveGenerator& moveGenerator, bool& isWhiteTurn, AudioManager& audioManager, U64& validMoves) {
+
+
 
     // Convert mouse coordinates to bitboard position and chessboard coordinates
     int releaseRow = 7 - releaseY / SQUARE_SIZE;
@@ -129,12 +131,18 @@ void handleMouseUp (int releaseX, int releaseY, PieceType& selectedPiece, int& s
     }
 
     // Generate all valid moves on the location of the piece
-    int selectedPiecePosition = selectedPieceY * 8 + selectedPieceX;
-    U64 validMoves = moveGenerator.generateMoves(selectedPiece, selectedPiecePosition);
+    int selectedPiecePos = selectedPieceY * 8 + selectedPieceX;
+
+    if (releaseBitPos == selectedPiecePos){
+        // cout << "Tried not to print" << endl;
+        return;
+    }
 
     // If move is valid, execute move
     if (validMoves & releaseMask) {
-        chessBoard.executeMove(selectedPiece, selectedPieceY * 8 + selectedPieceX, releaseBitPos);
+
+        
+        chessBoard.executeMove(selectedPiece, selectedPiecePos, releaseBitPos);
         moveGenerator.updatePieces();
 
         // Switch turn only after valid move
@@ -145,16 +153,13 @@ void handleMouseUp (int releaseX, int releaseY, PieceType& selectedPiece, int& s
         cout << "Release Bit Pos: " << releaseBitPos << endl;
         chessBoard.printU64(1ULL << releaseBitPos);
 
-    } else {
+        if (moveGenerator.isKingInCheck(isWhiteTurn)) audioManager.playSound(AudioType::CHECK);
+    
+    }
+
+    else {
         std::cout << "Invalid move!" << std::endl;
     }
-
-    if (moveGenerator.isKingInCheck(isWhiteTurn)) {
-        // Play check sound
-        audioManager.playSound(AudioType::CHECK);
-    }
-
-
 
 }
 
@@ -182,16 +187,17 @@ void gameLoop (SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGen
                 SDL_GetMouseState(&mouseX, &mouseY);
                 handleMouseDown(mouseX, mouseY, selectedPiece, selectedPieceX, selectedPieceY, chessBoard, isWhiteTurn);
                 if (selectedPiece != PieceType::EMPTY) {
-                    validMoves = moveGenerator.generateMoves(selectedPiece, selectedPieceY * 8 + selectedPieceX);
+                    validMoves = moveGenerator.generatePieceValidMoves(selectedPiece, selectedPieceY * 8 + selectedPieceX);
                 }
 
             }
+
 
             else if (windowEvent.type == SDL_MOUSEBUTTONUP) {
                        
                 int releaseX, releaseY;
                 SDL_GetMouseState(&releaseX, &releaseY);
-                handleMouseUp(releaseX, releaseY, selectedPiece, selectedPieceX, selectedPieceY, chessBoard, moveGenerator, isWhiteTurn, audioManager);
+                handleMouseUp(releaseX, releaseY, selectedPiece, selectedPieceX, selectedPieceY, chessBoard, moveGenerator, isWhiteTurn, audioManager, validMoves);
                 selectedPiece = PieceType::EMPTY;
                 validMoves = 0;
 

@@ -10,6 +10,7 @@
 using namespace std;
 typedef uint64_t U64;
 
+// Default starting setup
 
 class Board{
 
@@ -20,6 +21,7 @@ class Board{
 
     public:
         Board(AudioManager& audioManager);
+        Board(AudioManager& a, unordered_map<PieceType,U64> customBoard);
 
         // Board move helpers
         void movePiece(PieceType type, int fromPos, int toPos);
@@ -33,11 +35,28 @@ class Board{
         void printU64(U64 board);
         unordered_map<PieceType, U64> getCurrentBoard();
 
+        // Custom board creation
+        // Testing functions
+        void addPiece(PieceType type, int position);
+        void removePiece (PieceType type, int position);
         
 };
 
+void Board::addPiece (PieceType type, int position) {
+    currentBoard[type] |= (1ULL << position);
+}
+
+void Board::removePiece (PieceType type, int position) {
+    currentBoard[type] && ~(1ULL << position);
+}
+
 Board::Board(AudioManager& a) : audioManager(a) {
     initialiseBoard();
+    a.playSound(AudioType::START);
+}
+
+Board::Board(AudioManager& a, unordered_map<PieceType,U64> customBoard) : audioManager(a) {
+    currentBoard = customBoard;
     a.playSound(AudioType::START);
 }
 
@@ -128,28 +147,25 @@ void Board::printU64(U64 board){
 
 void Board::initialiseBoard(){
 
+    unordered_map<PieceType, U64> defaultBoard;
+
     // Starting positions for the white pieces
-    currentBoard[PieceType::WP] = 0xFF00ULL;
-    currentBoard[PieceType::WR] = 0x81ULL;
-    currentBoard[PieceType::WN] = 0x42ULL;
-    currentBoard[PieceType::WB] = 0x24ULL;
-    currentBoard[PieceType::WQ] = 0x08ULL;
-    currentBoard[PieceType::WK] = 0x10ULL;
+    defaultBoard[PieceType::WP] = 0xFF00ULL;
+    defaultBoard[PieceType::WR] = 0x81ULL;
+    defaultBoard[PieceType::WN] = 0x42ULL;
+    defaultBoard[PieceType::WB] = 0x24ULL;
+    defaultBoard[PieceType::WQ] = 0x08ULL;
+    defaultBoard[PieceType::WK] = 0x10ULL;
 
     // Black pieces are shifted "upwards"
-    currentBoard[PieceType::BP] = 0xFF00ULL << 8 * 5;
-    currentBoard[PieceType::BR] = 0x81ULL << 8 * 7;
-    currentBoard[PieceType::BN] = 0x42ULL << 8 * 7;
-    currentBoard[PieceType::BB] = 0x24ULL << 8 * 7;
-    currentBoard[PieceType::BQ] = 0x08ULL << 8 * 7;
-    currentBoard[PieceType::BK] = 0x10ULL << 8 * 7;
+    defaultBoard[PieceType::BP] = 0xFF00ULL << 8 * 5;
+    defaultBoard[PieceType::BR] = 0x81ULL << 8 * 7;
+    defaultBoard[PieceType::BN] = 0x42ULL << 8 * 7;
+    defaultBoard[PieceType::BB] = 0x24ULL << 8 * 7;
+    defaultBoard[PieceType::BQ] = 0x08ULL << 8 * 7;
+    defaultBoard[PieceType::BK] = 0x10ULL << 8 * 7;
 
-    // for(auto board : currentBoard){
-    //     cout << pieceTypeToString(board.first) << " :" << endl;
-    //     printU64(board.second);
-    //     cout << endl;
-    // }
-
+    currentBoard = defaultBoard;
 
 }
 

@@ -1,24 +1,22 @@
+#include <MoveGenerator.hpp>
+#include <Board.hpp>
 
-#include "Board.hpp"
-#include <cassert>
-#include <iostream>
-#include <AudioManager.hpp>
-#include <SDL.h>
-#include <SDL_mixer.h>
+int main(int argc, char *argv[]){
 
-void print(U64 board){
-    for(int rank = 8; rank >= 1; rank--) {
-        for(int file = 1; file <= 8; file++) {
-            int square = (rank - 1) * 8 + (file - 1);
-            std::cout << ((board >> square) & 1) << " ";
-        }
-        std::cout << std::endl;
-    }
-}
+    AudioManager a;
+    Board b(a);
+    MoveGenerator mg(b);
 
+    b.clearBoard();
 
+    int kingPos = 19;
+    int other = 18;
 
-int main(int argc, char* argv[]) {
-    AudioManager audio;
+    b.addPiece(PieceType::WK, 20);
+    b.addPiece(PieceType::BQ, 41);
+
+    b.printU64(3);
+
     return 0;
+
 }

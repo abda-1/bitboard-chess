@@ -56,7 +56,9 @@ class MoveGenerator{
 
     public:
         MoveGenerator(Board& board);
+
         void updatePieces();
+        void updatePieces(Board& board);
 
         bool isKingInCheck (bool isWhite, Board& currentBoard);
         bool isKingInCheck (bool isWhite);
@@ -96,45 +98,67 @@ U64 MoveGenerator::generatePieceValidMoves(PieceType pieceType, int position) {
         int toPos = findLSBIndex(possibleMovesAndAttacks);
         possibleMovesAndAttacks &= ~(1ULL << toPos);
 
-        // If the king is currently not in check -> check that a given move does not result in a check
-        if (!kingInCheck) {
+        U64 oldWhitePieces = whitePieces;
+        U64 oldBlackPieces = blackPieces;
 
-            // Simulate the move being executed
-            // Board tempBoard = chessBoard;
-            // tempBoard.executeMove(pieceType, position, toPos);
-            // if (!isKingInCheck(isWhite, tempBoard)) 
-            validMoves |= (1ULL << toPos);
+        // Simulate the move being executed
+        Board tempBoard = chessBoard;
+        tempBoard.executeMove(pieceType, position, toPos);
+        updatePieces(tempBoard);
+        
+        if (!isKingInCheck(isWhite, tempBoard)) validMoves |= (1ULL << toPos);
+        
+        // Reset move execution
+        whitePieces = oldWhitePieces;
+        blackPieces = oldBlackPieces;
 
-        }
+        // // If the king is currently not in check -> check that a given move does not result in a check
+        // if (!kingInCheck) {
 
-        // If the king is already in check -> check whether a given move results in a removal of the check 
-        else {
+        //     U64 oldWhitePieces = whitePieces;
+        //     U64 oldBlackPieces = blackPieces;
 
-            Board tempBoard = chessBoard;
-
-            // Find the pieces that are causing the check
-            std::vector<pair<PieceType, int>> checkingPieces = findCheckingPieces(isWhite, tempBoard);
-
-            if (checkingPieces.size() == 1) {
-
-                // If piece is non sliding, need to capture that piece
-                if (checkingPieces[0].first == PieceType::BP || checkingPieces[0].first == PieceType::WP || checkingPieces[0].first == PieceType::BN || checkingPieces[0].first == PieceType::WN) {
-                    validMoves |= ((1ULL << toPos) & (1ULL << checkingPieces[0].second));
-                }
-
-                else {
-
-                    // Find their line of attack
-                    U64 kingBoard = isWhite ? tempBoard.getCurrentBoard()[PieceType::WK] : tempBoard.getCurrentBoard()[PieceType::BK];
-                    int kingPos = findLSBIndex(kingBoard);
-                    U64 lineOfAttack = generateLineOfAttack(checkingPieces[0].second, kingPos);
-
-                    validMoves |= (lineOfAttack & (1ULL << toPos));
-                }
-
-            }
+        //     // Simulate the move being executed
+        //     Board tempBoard = chessBoard;
+        //     tempBoard.executeMove(pieceType, position, toPos);
+        //     updatePieces(tempBoard);
             
-        }
+        //     if (!isKingInCheck(isWhite, tempBoard)) validMoves |= (1ULL << toPos);
+            
+        //     // Reset move execution
+        //     whitePieces = oldWhitePieces;
+        //     blackPieces = oldBlackPieces;
+
+        // }
+
+        // // If the king is already in check -> check whether a given move results in a removal of the check 
+        // else {
+
+        //     Board tempBoard = chessBoard;
+
+        //     // Find the pieces that are causing the check
+        //     std::vector<pair<PieceType, int>> checkingPieces = findCheckingPieces(isWhite, tempBoard);
+
+        //     if (checkingPieces.size() == 1) {
+
+        //         // If piece is non sliding, need to capture that piece
+        //         if (checkingPieces[0].first == PieceType::BP || checkingPieces[0].first == PieceType::WP || checkingPieces[0].first == PieceType::BN || checkingPieces[0].first == PieceType::WN) {
+        //             validMoves |= ((1ULL << toPos) & (1ULL << checkingPieces[0].second));
+        //         }
+
+        //         else {
+
+        //             // Find their line of attack
+        //             U64 kingBoard = isWhite ? tempBoard.getCurrentBoard()[PieceType::WK] : tempBoard.getCurrentBoard()[PieceType::BK];
+        //             int kingPos = findLSBIndex(kingBoard);
+        //             U64 lineOfAttack = generateLineOfAttack(checkingPieces[0].second, kingPos);
+
+        //             validMoves |= (lineOfAttack & (1ULL << toPos));
+        //         }
+
+        //     }
+            
+        // }
 
     }
 
@@ -339,7 +363,20 @@ void MoveGenerator::updatePieces() {
         else blackPieces |= bitboard;
     }
 
-    // Need to update the cache here
+}
+
+void MoveGenerator::updatePieces(Board& board) {
+
+    // Intialise both boards to be null
+    whitePieces = 0; blackPieces = 0;
+
+    // Iterate through every board and append to whitePieces or blackPieces
+    for(const auto& [type, bitboard] : board.getCurrentBoard()) {
+        char colour = pieceTypeToString(type)[0];
+
+        if (colour == 'W') whitePieces |= bitboard;
+        else blackPieces |= bitboard;
+    }
 
 }
 

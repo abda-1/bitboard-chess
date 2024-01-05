@@ -5,7 +5,7 @@ Developed in C++, currently this application only supports player vs. player che
 
 The GUI for this application was inspired by [chess.com](https://www.chess.com/home).
 
-<img src="doc/chess_sample.png" width=45%></img> <img src="doc/chess_sample2.png" width=45%></img>
+<img src="doc/chess_sample.PNG" width=45%></img> <img src="doc/chess_sample2.PNG" width=45%></img>
 
 # Features
 - Check/ Checkmate detection

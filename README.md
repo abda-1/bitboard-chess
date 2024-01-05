@@ -1,4 +1,6 @@
 # Bitboard chess
+*(This project is something I like to work on in my free time, so keep that in mind when you explore it!)*
+
 This chess game stands out from the rest through leveraging bitboards to represent the chessboard and manage game states!   
 
 Developed in C++, currently this application only supports player vs. player chess, however can (and hopefully will be in the future) expanded upon to incorporate a player vs. AI gamemode.   

@@ -11,19 +11,11 @@
 
 using namespace std;
 
-/*
-    UI Class Responsibilites (class that works with SDL2)
-        - generate game state (chessboard) -> will be taken from Game class
-        - capture user input
-        - displaying on window
-            
-*/
-
 class UI{
 
     private:
-        int SQUARE_SIZE = 100;
-        int BOARD_SIZE = SQUARE_SIZE * 8;
+        int SQUARE_SIZE;
+        int BOARD_SIZE;
         
         TextureManager textureManager;
         SDL_Renderer* renderer;
@@ -32,7 +24,7 @@ class UI{
         void setSquareSize(int SQ_SIZE);
 
     public:
-        UI(SDL_Renderer* r, Board* b, int size) : renderer(r), textureManager(r), board(b), SQUARE_SIZE(size) {};
+        UI(SDL_Renderer* r, Board* b, int size) : renderer(r), textureManager(r), board(b), SQUARE_SIZE(size), BOARD_SIZE(size * 8) {};
 
         int getBoardSize();
         

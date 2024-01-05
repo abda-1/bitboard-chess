@@ -1,4 +1,6 @@
 #include <SDL.h>
+#include <SDL_mixer.h>
+#include <SDL_image.h>
 #include <iostream>
 #include <UI.hpp>
 #include <Board.hpp>
@@ -192,7 +194,6 @@ void gameLoop (SDL_Renderer* renderer, Board& chessBoard, MoveGenerator& moveGen
                 }
 
             }
-
 
             else if (windowEvent.type == SDL_MOUSEBUTTONUP) {
                        

@@ -16,17 +16,34 @@ The GUI for this application was inspired by [chess.com](https://www.chess.com/h
 - Real time visual feedback for valid moves and check
 - Audio feedback for game initialisation, valid moves, captures, check, and checkmates
 
-# How to run (currently only Windows OS)
+# How to run
+
 First begin by cloning the repository using   
 
 ```
 git clone https://github.com/abda-1/bitboard-chess.git
 ```
+
+## On Windows
 After navigating to the `bitboard-chess` directory, run
 
 ```
 make chess
 ./chess.exe
+```
+
+## On macOS
+First, ensure you have the required SDL2 libraries installed through Homebrew:
+
+```
+brew install sdl2 sdl2_image sdl2_mixer
+```
+
+Then build and run the project:
+
+```
+make
+./chess
 ```
 
 # How to play ?

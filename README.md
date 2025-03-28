@@ -32,7 +32,7 @@ make chess
 ./chess.exe
 ```
 
-## On macOS
+## On Linux
 First, ensure you have the required SDL2 libraries installed through Homebrew:
 
 ```
